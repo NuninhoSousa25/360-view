@@ -562,7 +562,6 @@ function loadImage(idx) {
   loader.load(
     url,
     (tex) => {
-      tex.encoding = THREE.sRGBEncoding;
       sphere.material = new THREE.MeshBasicMaterial({ map: tex });
       dbg(`Image loaded OK: ${url}`, 'ok');
       showLoader(false);
