@@ -18,11 +18,11 @@
   --border-hover:rgba(255,255,255,0.14);
   --accent:#c8a96e;
   --accent-dim:rgba(200,169,110,0.12);
-  --accent-glow:rgba(200,169,110,0.25);
   --text:#e8e4dc;
   --muted:rgba(232,228,220,0.38);
   --danger:#d9614e;
   --danger-dim:rgba(217,97,78,0.12);
+  --good:rgba(126,201,154,0.9);
   --radius:7px;
 }
 
@@ -33,7 +33,6 @@ html,body{
   font-family:'DM Sans',sans-serif;
 }
 
-/* grain overlay */
 body::before{
   content:'';
   position:fixed;inset:0;
@@ -41,281 +40,352 @@ body::before{
   pointer-events:none;z-index:0;opacity:.5;
 }
 
-/* ── LAYOUT ──────────────────────────────── */
-.shell{
+/* ── PAGE / LAYOUT ───────────────────────── */
+.page{
   position:relative;z-index:1;
-  max-width:780px;
+  max-width:1200px;
   margin:0 auto;
   padding:48px 24px 80px;
 }
 
+.layout{
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:28px;
+  align-items:start;
+}
+
+@media(max-width:820px){
+  .layout{grid-template-columns:1fr;}
+  .right-col{position:static !important;}
+}
+
+/* ── RIGHT COLUMN ────────────────────────── */
+.right-col{
+  position:sticky;
+  top:32px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* ── COLLAPSIBLE PANEL ───────────────────── */
+.panel{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.panel-head{
+  padding:13px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  user-select:none;
+  transition:background .15s;
+}
+.panel-head:hover{background:var(--surface2);}
+.panel-title{
+  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);
+}
+.panel-chevron{
+  font-size:.6rem;color:var(--muted);
+  transition:transform .2s;
+}
+.panel-chevron.open{transform:rotate(90deg);}
+.panel-body{padding:16px 18px;}
+.panel-body.hidden{display:none;}
+
+/* ── PREVIEW ─────────────────────────────── */
+.preview-img-wrap{
+  width:100%;
+  aspect-ratio:2/1;
+  background:var(--surface2);
+  border-radius:6px;
+  overflow:hidden;
+  position:relative;
+  margin-bottom:10px;
+}
+.preview-img-wrap img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:none;
+}
+.preview-empty{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);
+}
+.preview-footer{
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:8px;
+}
+.preview-label{
+  font-size:.85rem;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:180px;
+}
+.preview-size{
+  font-size:.68rem;color:var(--muted);
+  font-family:'Courier New',monospace;flex-shrink:0;
+}
+.preview-counter{
+  font-size:.65rem;color:var(--muted);margin-top:3px;
+}
+
+/* ── OPT CONTROLS ────────────────────────── */
+.opt-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-bottom:12px;
+}
+.opt-field label{
+  display:block;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px;
+}
+.opt-field select{
+  width:100%;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;
+  padding:7px 10px;outline:none;cursor:pointer;appearance:none;
+}
+.opt-field select option{background:var(--bg);}
+.opt-field input[type=range]{
+  width:100%;border:none;background:none;
+  accent-color:var(--accent);height:18px;padding:0;cursor:pointer;
+}
+.opt-radio-row{
+  display:flex;gap:14px;margin-bottom:12px;
+}
+.opt-radio-row label{
+  display:flex;align-items:center;gap:5px;
+  font-size:.78rem;color:var(--text);cursor:pointer;
+}
+.opt-radio-row input[type=radio]{accent-color:var(--accent);}
+.opt-check-row{
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;color:var(--muted);
+  margin-bottom:12px;cursor:pointer;
+}
+.opt-check-row input[type=checkbox]{accent-color:var(--accent);}
+
+/* ── STATS ───────────────────────────────── */
+.stats-block{
+  border-top:1px solid var(--border);
+  padding-top:12px;
+  display:flex;flex-direction:column;gap:5px;
+}
+.stats-row{
+  display:flex;justify-content:space-between;
+  font-size:.72rem;
+}
+.stats-key{color:var(--muted);}
+.stats-val{font-family:'Courier New',monospace;}
+.stats-val.good{color:var(--good);}
+.stats-val.warn{color:var(--accent);}
+.stats-val.bad{color:var(--danger);}
+
+/* ── IMPORT ROW ──────────────────────────── */
+.import-input-row{display:flex;gap:6px;}
+.import-input-row input{
+  flex:1;min-width:0;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;
+  padding:8px 11px;outline:none;transition:border-color .2s;
+}
+.import-input-row input:focus{border-color:var(--accent);}
+.import-input-row input::placeholder{color:var(--muted);}
+
 /* ── HEADER ──────────────────────────────── */
-header{margin-bottom:40px;}
+header{margin-bottom:36px;}
 .eyebrow{
   font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
   color:var(--accent);margin-bottom:8px;
 }
 h1{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(2.2rem,6vw,3.4rem);
-  letter-spacing:.1em;
-  line-height:1;
-  color:var(--text);
+  font-size:clamp(2.2rem,5vw,3.4rem);
+  letter-spacing:.1em;line-height:1;color:var(--text);
 }
 h1 span{color:var(--accent);}
 .subtitle{
-  margin-top:10px;
-  font-size:.85rem;
-  color:var(--muted);
-  font-weight:300;
-  line-height:1.6;
+  margin-top:10px;font-size:.85rem;
+  color:var(--muted);font-weight:300;line-height:1.6;
 }
 
-/* ── SECTION TITLE ───────────────────────── */
+/* ── SECTION LABEL ───────────────────────── */
 .section-label{
   font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;
 }
-.section-label::after{
-  content:'';flex:1;height:1px;background:var(--border);
-}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* ── PLAYLIST TITLE ──────────────────────── */
-.title-row{margin-bottom:28px;}
-.field-wrap{position:relative;}
+.title-row{margin-bottom:24px;}
 .field-wrap input{
   width:100%;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  color:var(--text);
-  font-family:'DM Sans',sans-serif;
-  font-size:.92rem;
-  padding:12px 16px;
-  outline:none;
-  transition:border-color .2s;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;
+  padding:12px 16px;outline:none;transition:border-color .2s;
 }
 .field-wrap input:focus{border-color:var(--accent);}
 .field-wrap input::placeholder{color:var(--muted);}
 
 /* ── ADD IMAGE ROW ───────────────────────── */
-.add-section{margin-bottom:28px;}
-.add-row{display:flex;gap:8px;align-items:stretch;}
+.add-section{margin-bottom:24px;}
+.add-row{display:flex;gap:8px;}
 .add-row input{
   flex:1;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  color:var(--text);
-  font-family:'DM Sans',sans-serif;
-  font-size:.88rem;
-  padding:11px 14px;
-  outline:none;
-  transition:border-color .2s;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;
+  padding:11px 14px;outline:none;transition:border-color .2s;
 }
 .add-row input:focus{border-color:var(--accent);}
 .add-row input::placeholder{color:var(--muted);}
 
+/* ── BUTTONS ─────────────────────────────── */
 .btn{
   display:inline-flex;align-items:center;gap:6px;
-  padding:11px 18px;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  background:var(--surface2);
-  color:var(--text);
-  font-family:'DM Sans',sans-serif;
-  font-size:.83rem;
-  font-weight:500;
-  cursor:pointer;
-  white-space:nowrap;
-  transition:background .18s,border-color .18s,color .18s;
-  letter-spacing:.02em;
+  padding:10px 16px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface2);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:500;
+  cursor:pointer;white-space:nowrap;
+  transition:background .18s,border-color .18s;letter-spacing:.02em;
 }
 .btn:hover{background:var(--surface3);border-color:var(--border-hover);}
 .btn svg{width:14px;height:14px;flex-shrink:0;}
-
-.btn-accent{
-  background:var(--accent);color:#0c0c0c;
-  border-color:var(--accent);
-}
+.btn-accent{background:var(--accent);color:#0c0c0c;border-color:var(--accent);}
 .btn-accent:hover{background:#d4b87a;border-color:#d4b87a;}
-
-.btn-file{
-  border-style:dashed;
-}
+.btn-sm{padding:7px 12px;font-size:.78rem;}
+.btn-file{border-style:dashed;}
 .btn-file:hover{background:var(--accent-dim);border-color:rgba(200,169,110,0.4);color:var(--accent);}
 
 .divider-or{
-  text-align:center;
-  font-size:.72rem;letter-spacing:.1em;
-  color:var(--muted);
-  margin:10px 0;
-  position:relative;
+  text-align:center;font-size:.72rem;letter-spacing:.1em;color:var(--muted);
+  margin:10px 0;position:relative;
 }
 .divider-or::before,.divider-or::after{
   content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);
 }
-.divider-or::before{left:0;}
-.divider-or::after{right:0;}
+.divider-or::before{left:0;}.divider-or::after{right:0;}
 
 /* ── CARD LIST ───────────────────────────── */
 #cardList{
-  display:flex;flex-direction:column;gap:8px;
-  min-height:60px;
-  margin-bottom:32px;
+  display:flex;flex-direction:column;gap:6px;
+  min-height:60px;margin-bottom:28px;
 }
-
 .empty-state{
-  border:1px dashed var(--border);
-  border-radius:var(--radius);
-  padding:40px 20px;
-  text-align:center;
-  color:var(--muted);
-  font-size:.82rem;
-  letter-spacing:.04em;
+  border:1px dashed var(--border);border-radius:var(--radius);
+  padding:40px 20px;text-align:center;color:var(--muted);
+  font-size:.82rem;letter-spacing:.04em;
 }
 
 /* ── IMAGE CARD ──────────────────────────── */
 .img-card{
-  display:grid;
-  grid-template-columns:64px 1fr auto;
-  gap:12px;
-  align-items:center;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:10px 14px;
-  animation:slideIn .22s ease;
-  cursor:grab;
+  display:grid;grid-template-columns:64px 1fr auto;
+  gap:10px;align-items:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:8px 12px;
+  animation:slideIn .22s ease;cursor:pointer;
   transition:border-color .18s,background .18s;
 }
 .img-card:active{cursor:grabbing;}
 .img-card.drag-over{border-color:var(--accent);background:var(--accent-dim);}
 .img-card.dragging{opacity:.35;}
+.img-card.active{border-color:var(--accent);background:var(--accent-dim);}
 
 @keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
 
 .card-thumb{
-  width:64px;height:40px;
-  border-radius:4px;
-  overflow:hidden;
-  background:var(--surface3);
-  flex-shrink:0;
+  width:64px;height:40px;border-radius:4px;
+  overflow:hidden;background:var(--surface3);flex-shrink:0;
 }
 .card-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .card-thumb .no-preview{
-  width:100%;height:100%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--muted);
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
 }
-
 .card-body{min-width:0;}
 .card-label-input{
-  width:100%;
-  background:transparent;
-  border:none;
-  border-bottom:1px solid transparent;
-  color:var(--text);
-  font-family:'DM Sans',sans-serif;
-  font-size:.85rem;
-  font-weight:500;
-  padding:2px 0;
-  outline:none;
-  transition:border-color .18s;
+  width:100%;background:transparent;border:none;
+  border-bottom:1px solid transparent;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;
+  padding:2px 0;outline:none;transition:border-color .18s;
 }
 .card-label-input:focus{border-bottom-color:var(--accent);}
 .card-label-input::placeholder{color:var(--muted);font-weight:300;font-style:italic;}
-.card-url{
-  font-size:.7rem;color:var(--muted);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  margin-top:3px;
+.card-meta{
+  font-size:.68rem;color:var(--muted);
+  display:flex;align-items:center;gap:6px;margin-top:2px;
+  white-space:nowrap;overflow:hidden;
+}
+.card-url-text{overflow:hidden;text-overflow:ellipsis;}
+.size-badge{
+  font-size:.62rem;color:var(--accent);
+  background:var(--accent-dim);border-radius:3px;
+  padding:1px 5px;white-space:nowrap;flex-shrink:0;
 }
 
 .card-actions{display:flex;gap:4px;flex-shrink:0;}
 .icon-btn{
-  width:30px;height:30px;
-  border:1px solid transparent;
-  border-radius:5px;
-  background:transparent;
-  color:var(--muted);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
+  width:28px;height:28px;border:1px solid transparent;border-radius:5px;
+  background:transparent;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
   transition:background .15s,color .15s,border-color .15s;
 }
 .icon-btn:hover{background:var(--surface3);color:var(--text);border-color:var(--border);}
 .icon-btn.del:hover{background:var(--danger-dim);color:var(--danger);border-color:rgba(217,97,78,0.25);}
-.icon-btn svg{width:13px;height:13px;}
+.icon-btn svg{width:12px;height:12px;}
 
 /* ── EXPORT SECTION ──────────────────────── */
 .export-section{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:24px 28px;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;
 }
 .export-section h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.3rem;letter-spacing:.12em;
+  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.12em;
   color:var(--accent);margin-bottom:4px;
 }
-.export-section p{
-  font-size:.8rem;color:var(--muted);margin-bottom:20px;line-height:1.6;
-}
-.export-row{display:flex;gap:10px;flex-wrap:wrap;}
+.export-section p{font-size:.78rem;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.export-row{display:flex;gap:8px;flex-wrap:wrap;}
 
-/* ── PREVIEW JSON ────────────────────────── */
 #jsonPreview{
-  margin-top:16px;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:14px 16px;
-  font-family:'Courier New',monospace;
-  font-size:.72rem;
-  color:var(--muted);
-  line-height:1.6;
-  max-height:180px;
-  overflow-y:auto;
-  display:none;
-  white-space:pre;
+  margin-top:14px;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px;
+  font-family:'Courier New',monospace;font-size:.7rem;color:var(--muted);
+  line-height:1.6;max-height:160px;overflow-y:auto;display:none;white-space:pre;
 }
 #jsonPreview.show{display:block;}
 
-/* ── COUNT BADGE ─────────────────────────── */
+/* ── BADGE / TOAST ───────────────────────── */
 .count-badge{
   display:inline-flex;align-items:center;justify-content:center;
   min-width:20px;height:20px;padding:0 6px;
-  background:var(--accent-dim);
-  color:var(--accent);
-  border-radius:20px;
-  font-size:.68rem;font-weight:500;
-  margin-left:6px;
+  background:var(--accent-dim);color:var(--accent);
+  border-radius:20px;font-size:.68rem;font-weight:500;margin-left:6px;
 }
-
-/* ── TOAST ───────────────────────────────── */
 #toast{
   position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:10px 20px;
-  font-size:.8rem;letter-spacing:.04em;
-  color:var(--text);
-  opacity:0;pointer-events:none;
-  transition:opacity .25s,transform .25s;
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:10px 20px;font-size:.8rem;letter-spacing:.04em;color:var(--text);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
   z-index:999;white-space:nowrap;
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
-<div class="shell">
+<div class="page">
+<div class="layout">
 
-  <!-- HEADER -->
+<!-- ══ LEFT COLUMN ══════════════════════════════════════ -->
+<div class="left-col">
+
   <header>
     <div class="eyebrow">360° Tools</div>
     <h1>Playlist <span>Builder</span></h1>
-    <p class="subtitle">Compose a playlist of 360° panoramas, export as a single JSON file,<br>upload it to your server, and share one URL with your client.</p>
+    <p class="subtitle">Compose a playlist of 360° panoramas, download as JSON,<br>host it on your server and share one URL with your client.</p>
   </header>
 
   <!-- PLAYLIST TITLE -->
@@ -330,7 +400,6 @@ h1 span{color:var(--accent);}
   <div class="add-section">
     <div class="section-label">Add images <span class="count-badge" id="countBadge">0</span></div>
 
-    <!-- paste URL -->
     <div class="add-row">
       <input type="url" id="urlInput" placeholder="Paste image URL — https://yourserver.com/photo.jpg" />
       <button class="btn btn-accent" onclick="addFromUrl()">
@@ -341,14 +410,13 @@ h1 span{color:var(--accent);}
 
     <div class="divider-or">or</div>
 
-    <!-- load from device -->
     <button class="btn btn-file" style="width:100%;justify-content:center;" onclick="document.getElementById('fileInput').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Load images from device
     </button>
     <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="addFromFiles(this.files)"/>
     <p style="font-size:.7rem;color:var(--muted);margin-top:7px;line-height:1.5;">
-      ⚠️ Local files will be embedded as base64 in the JSON — best for previewing. For sharing with clients, upload to your server first and use URLs instead.
+      Local files are compressed and embedded as base64 — fine for local preview. For client sharing, upload images to a server and use URLs.
     </p>
   </div>
 
@@ -361,41 +429,13 @@ h1 span{color:var(--accent);}
   <!-- EXPORT -->
   <div class="export-section">
     <h2>Export Playlist</h2>
-    <p>Generate a single shareable URL with your entire playlist embedded — no server fetch, no CORS issues. Or download the JSON to host it yourself.</p>
-
-    <!-- VIEWER URL INPUT -->
-    <div style="margin-bottom:16px;">
-      <label style="display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Your 360viewer.html URL</label>
-      <input type="url" id="viewerUrlInput" value="https://nuno-sousa.com/repository/uploads/360viewer.html"
-        placeholder="https://yourserver.com/360viewer.html"
-        style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:10px 13px;outline:none;transition:border-color .2s;"
-        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''" />
-    </div>
-
-    <!-- GENERATED SHARE URL -->
-    <div id="shareUrlWrap" style="display:none;margin-bottom:16px;">
-      <label style="display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Share URL <span style="color:var(--accent);font-size:.65rem;">(ready to send to client)</span></label>
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="shareUrlOutput" readonly
-          style="flex:1;background:var(--bg);border:1px solid rgba(200,169,110,0.3);border-radius:var(--radius);color:var(--accent);font-family:'Courier New',monospace;font-size:.72rem;padding:10px 13px;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" />
-        <button class="btn btn-accent" onclick="copyShareUrl()" style="flex-shrink:0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          Copy
-        </button>
-      </div>
-      <div id="urlLengthWarn" style="font-size:.72rem;color:var(--muted);margin-top:6px;"></div>
-    </div>
-
+    <p>Download as JSON, host on your server, load in the viewer via <code>?playlist=https://…/tour.json</code>.</p>
     <div class="export-row">
-      <button class="btn btn-accent" onclick="generateShareUrl()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        Generate Share URL
-      </button>
-      <button class="btn" onclick="downloadJSON()">
+      <button class="btn btn-accent" onclick="downloadJSON()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download JSON
       </button>
-      <button class="btn" onclick="togglePreview()">
+      <button class="btn" onclick="toggleJsonPreview()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Preview JSON
       </button>
@@ -403,7 +443,134 @@ h1 span{color:var(--accent);}
     <pre id="jsonPreview"></pre>
   </div>
 
-</div>
+</div><!-- /left-col -->
+
+<!-- ══ RIGHT COLUMN ═════════════════════════════════════ -->
+<div class="right-col">
+
+  <!-- LIVE PREVIEW -->
+  <div class="panel">
+    <div class="panel-body">
+      <div class="preview-img-wrap">
+        <img id="previewImg" />
+        <div class="preview-empty" id="previewEmpty">Select an image</div>
+      </div>
+      <div class="preview-footer">
+        <div class="preview-label" id="previewLabel"></div>
+        <div class="preview-size" id="previewSize"></div>
+      </div>
+      <div class="preview-counter" id="previewCounter"></div>
+    </div>
+  </div>
+
+  <!-- IMAGE OPTIMIZATION -->
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel('optBody','optChev')">
+      <span class="panel-title">Image Optimization</span>
+      <span class="panel-chevron" id="optChev">▶</span>
+    </div>
+    <div class="panel-body" id="optBody">
+      <div class="opt-grid">
+        <div class="opt-field">
+          <label>Max dimension</label>
+          <select id="optMaxDim" onchange="updateOptSettings()">
+            <option value="1024">1024 px</option>
+            <option value="2048" selected>2048 px</option>
+            <option value="4096">4096 px</option>
+            <option value="0">Original</option>
+          </select>
+        </div>
+        <div class="opt-field">
+          <label>Quality — <span id="optQualityVal">82%</span></label>
+          <input type="range" id="optQuality" min="50" max="100" value="82" oninput="updateOptSettings()"/>
+        </div>
+      </div>
+
+      <div class="opt-radio-row">
+        <label><input type="radio" name="optFmt" value="webp" checked onchange="updateOptSettings()"> WebP</label>
+        <label><input type="radio" name="optFmt" value="jpeg" onchange="updateOptSettings()"> JPEG</label>
+        <label><input type="radio" name="optFmt" value="original" onchange="updateOptSettings()"> Original</label>
+      </div>
+
+      <label class="opt-check-row">
+        <input type="checkbox" id="optAuto" checked onchange="updateOptSettings()"> Auto-compress on upload
+      </label>
+
+      <div class="stats-block">
+        <div class="stats-row">
+          <span class="stats-key">Local images</span>
+          <span class="stats-val" id="statCount">0</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-key">Total embedded size</span>
+          <span class="stats-val" id="statTotal">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPORT PLAYLIST -->
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel('importBody','importChev')">
+      <span class="panel-title">Import Playlist</span>
+      <span class="panel-chevron" id="importChev">▶</span>
+    </div>
+    <div class="panel-body hidden" id="importBody">
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:10px;line-height:1.5;">
+        Paste a hosted playlist JSON URL to load it into the builder.
+      </p>
+      <div class="import-input-row">
+        <input type="url" id="importUrlInput" placeholder="https://yourserver.com/tour.json" />
+        <button class="btn btn-sm" onclick="importFromUrl()">Load</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE LINK GENERATOR -->
+  <div class="panel">
+    <div class="panel-head" onclick="togglePanel('shareBody','shareChev')">
+      <span class="panel-title">Share Link Generator</span>
+      <span class="panel-chevron" id="shareChev">▶</span>
+    </div>
+    <div class="panel-body hidden" id="shareBody">
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+        Upload your JSON to a server, paste the URL below to build a ready-to-send viewer link.
+      </p>
+
+      <div class="opt-field" style="margin-bottom:10px;">
+        <label>Hosted JSON URL</label>
+        <input type="url" id="shareJsonUrl" placeholder="https://yourserver.com/tour.json"
+          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:8px 11px;outline:none;transition:border-color .2s;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"/>
+      </div>
+
+      <div class="opt-field" style="margin-bottom:12px;">
+        <label>Viewer URL</label>
+        <input type="url" id="shareViewerUrl" placeholder="https://yourserver.com/360viewer.html"
+          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:8px 11px;outline:none;transition:border-color .2s;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"/>
+      </div>
+
+      <button class="btn btn-accent" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="generateShareLink()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Generate & Copy Link
+      </button>
+
+      <div id="shareOutputWrap" style="display:none;">
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="shareOutput" readonly
+            style="flex:1;min-width:0;background:var(--bg);border:1px solid rgba(200,169,110,0.3);border-radius:var(--radius);color:var(--accent);font-family:'Courier New',monospace;font-size:.68rem;padding:8px 10px;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"/>
+          <button class="btn btn-sm" onclick="copyShareLink()" title="Copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /right-col -->
+</div><!-- /layout -->
+</div><!-- /page -->
 
 <div id="toast"></div>
 
@@ -411,8 +578,107 @@ h1 span{color:var(--accent);}
 // ═══════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════
-let items = []; // { id, url, label, isBase64 }
+let items = [];       // { id, url, label, isBase64, sizeBytes }
 let dragSrc = null;
+let selectedIdx = -1;
+
+const opt = { maxDim: 2048, quality: 0.82, format: 'webp', auto: true };
+
+// ═══════════════════════════════════════
+//  PANEL TOGGLE
+// ═══════════════════════════════════════
+function togglePanel(bodyId, chevId) {
+  const body = document.getElementById(bodyId);
+  const chev = document.getElementById(chevId);
+  const opening = body.classList.toggle('hidden');
+  chev.classList.toggle('open', !opening);
+}
+
+// ═══════════════════════════════════════
+//  OPTIMIZATION SETTINGS
+// ═══════════════════════════════════════
+function updateOptSettings() {
+  const maxDimVal = parseInt(document.getElementById('optMaxDim').value);
+  opt.maxDim   = maxDimVal === 0 ? Infinity : maxDimVal;
+  opt.quality  = parseInt(document.getElementById('optQuality').value) / 100;
+  opt.format   = document.querySelector('input[name="optFmt"]:checked').value;
+  opt.auto     = document.getElementById('optAuto').checked;
+  document.getElementById('optQualityVal').textContent = document.getElementById('optQuality').value + '%';
+  document.getElementById('optQuality').disabled = opt.format === 'original';
+  updateStats();
+}
+
+// ═══════════════════════════════════════
+//  IMAGE COMPRESSION (Canvas API)
+// ═══════════════════════════════════════
+function compressImage(file) {
+  return new Promise(resolve => {
+    // Skip canvas if no resize and original format requested
+    if (opt.format === 'original' && opt.maxDim === Infinity) {
+      const fr = new FileReader();
+      fr.onload = e => resolve(e.target.result);
+      fr.readAsDataURL(file);
+      return;
+    }
+
+    const objUrl = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = () => {
+      URL.revokeObjectURL(objUrl);
+      let w = img.naturalWidth, h = img.naturalHeight;
+
+      if (opt.maxDim !== Infinity && Math.max(w, h) > opt.maxDim) {
+        const scale = opt.maxDim / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      const mime = opt.format === 'webp'  ? 'image/webp'
+                 : opt.format === 'jpeg' ? 'image/jpeg'
+                 : file.type;
+
+      resolve(canvas.toDataURL(mime, opt.quality));
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objUrl);
+      const fr = new FileReader();
+      fr.onload = e => resolve(e.target.result);
+      fr.readAsDataURL(file);
+    };
+
+    img.src = objUrl;
+  });
+}
+
+function dataUrlBytes(dataUrl) {
+  const b64 = dataUrl.split(',')[1] || '';
+  return Math.round(b64.length * 3 / 4);
+}
+
+function fmtBytes(b) {
+  if (b < 1024)        return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+  return (b / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+// ═══════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════
+function updateStats() {
+  const local = items.filter(i => i.isBase64);
+  const total = local.reduce((s, i) => s + (i.sizeBytes || 0), 0);
+  document.getElementById('statCount').textContent = local.length;
+  const el = document.getElementById('statTotal');
+  if (!local.length) { el.textContent = '—'; el.className = 'stats-val'; return; }
+  el.textContent = fmtBytes(total);
+  el.className = 'stats-val ' + (total > 5e6 ? 'bad' : total > 1e6 ? 'warn' : 'good');
+}
 
 // ═══════════════════════════════════════
 //  ADD FROM URL
@@ -421,11 +687,10 @@ function addFromUrl() {
   const input = document.getElementById('urlInput');
   const raw = input.value.trim();
   if (!raw) return;
-
-  // support comma or newline separated batch paste
   const urls = raw.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 4);
-  urls.forEach(url => pushItem({ url, label: guessLabel(url), isBase64: false }));
+  urls.forEach(url => pushItem({ url, label: guessLabel(url), isBase64: false, sizeBytes: 0 }));
   input.value = '';
+  if (selectedIdx === -1 && items.length) selectItem(0);
   renderList();
 }
 
@@ -434,26 +699,63 @@ document.getElementById('urlInput').addEventListener('keydown', e => {
 });
 
 // ═══════════════════════════════════════
-//  ADD FROM FILES (base64)
+//  ADD FROM FILES
 // ═══════════════════════════════════════
-function addFromFiles(files) {
-  [...files].forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      pushItem({ url: e.target.result, label: file.name.replace(/\.[^.]+$/, ''), isBase64: true });
-      renderList();
-    };
-    reader.readAsDataURL(file);
-  });
+async function addFromFiles(files) {
+  for (const file of [...files]) {
+    const dataUrl = opt.auto
+      ? await compressImage(file)
+      : await new Promise(r => { const fr = new FileReader(); fr.onload = e => r(e.target.result); fr.readAsDataURL(file); });
+
+    const sizeBytes = dataUrlBytes(dataUrl);
+    pushItem({
+      url: dataUrl,
+      label: file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+      isBase64: true,
+      sizeBytes
+    });
+    if (selectedIdx === -1) selectItem(items.length - 1);
+    renderList();
+  }
   document.getElementById('fileInput').value = '';
+}
+
+// ═══════════════════════════════════════
+//  IMPORT FROM URL
+// ═══════════════════════════════════════
+async function importFromUrl() {
+  const url = document.getElementById('importUrlInput').value.trim();
+  if (!url) { showToast('Enter a JSON URL first.'); return; }
+  showToast('Loading…');
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const loaded = (data.images || [])
+      .map(i => typeof i === 'string'
+        ? { url: i, label: guessLabel(i) }
+        : { url: i.url || '', label: i.label || guessLabel(i.url || '') })
+      .filter(i => i.url)
+      .map(i => ({ id: uid(), isBase64: false, sizeBytes: 0, ...i }));
+
+    if (!loaded.length) { showToast('No images found in JSON.'); return; }
+    if (data.title) document.getElementById('playlistTitle').value = data.title;
+    items = loaded;
+    selectedIdx = 0;
+    renderList();
+    selectItem(0);
+    showToast(`Loaded ${loaded.length} image(s) ✓`);
+  } catch(e) {
+    showToast(`Import failed: ${e.message}`);
+  }
 }
 
 // ═══════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════
-function pushItem(data) {
-  items.push({ id: Date.now() + Math.random(), ...data });
-}
+function uid() { return Date.now() + Math.random(); }
+
+function pushItem(data) { items.push({ id: uid(), ...data }); }
 
 function guessLabel(url) {
   try {
@@ -463,38 +765,74 @@ function guessLabel(url) {
 }
 
 function removeItem(id) {
+  const idx = items.findIndex(i => i.id === id);
   items = items.filter(i => i.id !== id);
+  if (!items.length) { selectedIdx = -1; clearPreview(); }
+  else {
+    selectedIdx = Math.min(idx, items.length - 1);
+    selectItem(selectedIdx);
+  }
   renderList();
 }
 
 function moveItem(fromIdx, toIdx) {
   const [item] = items.splice(fromIdx, 1);
   items.splice(toIdx, 0, item);
+  if (selectedIdx === fromIdx) selectedIdx = toIdx;
   renderList();
 }
 
 // ═══════════════════════════════════════
-//  RENDER
+//  PREVIEW
+// ═══════════════════════════════════════
+function selectItem(idx) {
+  selectedIdx = idx;
+  const item = items[idx];
+  if (!item) { clearPreview(); return; }
+  const img = document.getElementById('previewImg');
+  img.src = item.url;
+  img.style.display = 'block';
+  document.getElementById('previewEmpty').style.display = 'none';
+  document.getElementById('previewLabel').textContent = item.label || `Image ${idx + 1}`;
+  document.getElementById('previewSize').textContent   = item.isBase64 ? fmtBytes(item.sizeBytes) : '';
+  document.getElementById('previewCounter').textContent = items.length > 1 ? `${idx + 1} / ${items.length}` : '';
+}
+
+function clearPreview() {
+  document.getElementById('previewImg').style.display = 'none';
+  document.getElementById('previewEmpty').style.display = 'flex';
+  document.getElementById('previewLabel').textContent  = '';
+  document.getElementById('previewSize').textContent   = '';
+  document.getElementById('previewCounter').textContent = '';
+}
+
+// ═══════════════════════════════════════
+//  RENDER LIST
 // ═══════════════════════════════════════
 function renderList() {
-  const list = document.getElementById('cardList');
-  const empty = document.getElementById('emptyState');
+  const list  = document.getElementById('cardList');
   document.getElementById('countBadge').textContent = items.length;
+  updateStats();
 
   if (!items.length) {
     list.innerHTML = '';
-    list.appendChild(empty);
+    list.appendChild(document.getElementById('emptyState'));
     return;
   }
 
   list.innerHTML = '';
   items.forEach((item, idx) => {
     const card = document.createElement('div');
-    card.className = 'img-card';
+    card.className = 'img-card' + (idx === selectedIdx ? ' active' : '');
     card.draggable = true;
-    card.dataset.idx = idx;
 
-    // thumb
+    card.addEventListener('click', e => {
+      if (e.target.closest('.icon-btn') || e.target.closest('.card-label-input')) return;
+      selectItem(idx);
+      renderList();
+    });
+
+    // Thumb
     const thumb = document.createElement('div');
     thumb.className = 'card-thumb';
     if (item.url) {
@@ -506,7 +844,7 @@ function renderList() {
       thumb.innerHTML = '<div class="no-preview">No preview</div>';
     }
 
-    // body
+    // Body
     const body = document.createElement('div');
     body.className = 'card-body';
 
@@ -515,25 +853,44 @@ function renderList() {
     labelInput.type = 'text';
     labelInput.value = item.label;
     labelInput.placeholder = 'Add a label…';
-    labelInput.oninput = e => { items[idx].label = e.target.value; };
+    labelInput.oninput = e => {
+      items[idx].label = e.target.value;
+      if (idx === selectedIdx)
+        document.getElementById('previewLabel').textContent = e.target.value || `Image ${idx + 1}`;
+    };
 
-    const urlDiv = document.createElement('div');
-    urlDiv.className = 'card-url';
-    urlDiv.textContent = item.isBase64 ? '📁 Local file (base64)' : item.url;
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+    if (item.isBase64) {
+      const urlSpan = document.createElement('span');
+      urlSpan.className = 'card-url-text';
+      urlSpan.textContent = 'Local file';
+      meta.appendChild(urlSpan);
+      if (item.sizeBytes) {
+        const badge = document.createElement('span');
+        badge.className = 'size-badge';
+        badge.textContent = fmtBytes(item.sizeBytes);
+        meta.appendChild(badge);
+      }
+    } else {
+      const urlSpan = document.createElement('span');
+      urlSpan.className = 'card-url-text';
+      urlSpan.textContent = item.url;
+      meta.appendChild(urlSpan);
+    }
 
     body.appendChild(labelInput);
-    body.appendChild(urlDiv);
+    body.appendChild(meta);
 
-    // actions
+    // Actions
     const actions = document.createElement('div');
     actions.className = 'card-actions';
 
-    // drag handle
     const grip = document.createElement('div');
     grip.className = 'icon-btn';
     grip.title = 'Drag to reorder';
-    grip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>`;
     grip.style.cursor = 'grab';
+    grip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>`;
 
     const del = document.createElement('div');
     del.className = 'icon-btn del';
@@ -548,14 +905,14 @@ function renderList() {
     card.appendChild(body);
     card.appendChild(actions);
 
-    // drag events
+    // Drag & drop
     card.addEventListener('dragstart', e => {
       dragSrc = idx;
       setTimeout(() => card.classList.add('dragging'), 0);
       e.dataTransfer.effectAllowed = 'move';
     });
     card.addEventListener('dragend', () => {
-      document.querySelectorAll('.img-card').forEach(c => c.classList.remove('dragging','drag-over'));
+      document.querySelectorAll('.img-card').forEach(c => c.classList.remove('dragging', 'drag-over'));
     });
     card.addEventListener('dragover', e => {
       e.preventDefault();
@@ -571,12 +928,11 @@ function renderList() {
     list.appendChild(card);
   });
 
-  // update preview if open
-  if (document.getElementById('jsonPreview').classList.contains('show')) updatePreview();
+  if (document.getElementById('jsonPreview').classList.contains('show')) updateJsonPreview();
 }
 
 // ═══════════════════════════════════════
-//  JSON BUILD
+//  JSON BUILD & EXPORT
 // ═══════════════════════════════════════
 function buildJSON() {
   const title = document.getElementById('playlistTitle').value.trim() || 'My 360° Tour';
@@ -585,43 +941,9 @@ function buildJSON() {
     created: new Date().toISOString(),
     images: items.map(i => ({
       url: i.url,
-      label: i.label || undefined
+      ...(i.label ? { label: i.label } : {})
     }))
   };
-}
-
-function generateShareUrl() {
-  if (!items.length) { showToast('Add at least one image first.'); return; }
-  const viewerUrl = document.getElementById('viewerUrlInput').value.trim();
-  if (!viewerUrl) { showToast('Enter your 360viewer.html URL first.'); return; }
-
-  const json = JSON.stringify(buildJSON());
-  const encoded = btoa(encodeURIComponent(json));
-  const fullUrl = `${viewerUrl}?data=${encoded}`;
-
-  document.getElementById('shareUrlOutput').value = fullUrl;
-  document.getElementById('shareUrlWrap').style.display = 'block';
-
-  // Warn if URL is very long (some browsers/servers cap at ~8000 chars)
-  const warn = document.getElementById('urlLengthWarn');
-  if (fullUrl.length > 8000) {
-    warn.textContent = `⚠️ URL is ${fullUrl.length} chars — very long URLs may not work in all browsers. Consider hosting the JSON instead.`;
-    warn.style.color = '#c8a96e';
-  } else {
-    warn.textContent = `✅ URL length: ${fullUrl.length} chars — looks good.`;
-    warn.style.color = 'rgba(232,228,220,0.35)';
-  }
-
-  // scroll into view
-  document.getElementById('shareUrlWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function copyShareUrl() {
-  const val = document.getElementById('shareUrlOutput').value;
-  if (!val) return;
-  navigator.clipboard.writeText(val)
-    .then(() => showToast('Share URL copied ✓'))
-    .catch(() => showToast('Copy failed — select and copy manually.'));
 }
 
 function downloadJSON() {
@@ -631,35 +953,48 @@ function downloadJSON() {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   const slug = (document.getElementById('playlistTitle').value.trim() || 'playlist')
-    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   a.download = slug + '.json';
   a.click();
   showToast('JSON downloaded ✓');
 }
 
-function togglePreview() {
+function toggleJsonPreview() {
   const pre = document.getElementById('jsonPreview');
   if (pre.classList.contains('show')) { pre.classList.remove('show'); return; }
-  updatePreview();
+  updateJsonPreview();
   pre.classList.add('show');
 }
 
-function updatePreview() {
-  const pre = document.getElementById('jsonPreview');
+function updateJsonPreview() {
   const obj = buildJSON();
-  // truncate base64 for display
   const display = JSON.parse(JSON.stringify(obj));
   display.images.forEach(i => {
     if (i.url && i.url.startsWith('data:')) i.url = i.url.substring(0, 60) + '… [base64]';
   });
-  pre.textContent = JSON.stringify(display, null, 2);
+  document.getElementById('jsonPreview').textContent = JSON.stringify(display, null, 2);
 }
 
-function copyJSON() {
-  if (!items.length) { showToast('Add at least one image first.'); return; }
-  navigator.clipboard.writeText(JSON.stringify(buildJSON(), null, 2))
-    .then(() => showToast('Copied to clipboard ✓'))
-    .catch(() => showToast('Copy failed — try downloading instead.'));
+// ═══════════════════════════════════════
+//  SHARE LINK GENERATOR
+// ═══════════════════════════════════════
+function generateShareLink() {
+  const jsonUrl   = document.getElementById('shareJsonUrl').value.trim();
+  const viewerUrl = document.getElementById('shareViewerUrl').value.trim();
+  if (!jsonUrl)   { showToast('Enter the hosted JSON URL first.'); return; }
+  if (!viewerUrl) { showToast('Enter your viewer URL first.'); return; }
+  const url = `${viewerUrl}?playlist=${encodeURIComponent(jsonUrl)}`;
+  document.getElementById('shareOutput').value = url;
+  document.getElementById('shareOutputWrap').style.display = 'block';
+  copyShareLink();
+}
+
+function copyShareLink() {
+  const val = document.getElementById('shareOutput').value;
+  if (!val) return;
+  navigator.clipboard.writeText(val)
+    .then(() => showToast('Link copied ✓'))
+    .catch(() => showToast('Copy failed — select manually.'));
 }
 
 // ═══════════════════════════════════════
