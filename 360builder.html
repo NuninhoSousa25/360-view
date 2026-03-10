@@ -410,11 +410,18 @@ h1 span{color:var(--accent);}
 
     <div class="divider-or">or</div>
 
-    <button class="btn btn-file" style="width:100%;justify-content:center;" onclick="document.getElementById('fileInput').click()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Load images from device
-    </button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-file" style="flex:1;justify-content:center;" onclick="document.getElementById('fileInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Load files
+      </button>
+      <button class="btn btn-file" style="flex:1;justify-content:center;" onclick="document.getElementById('folderInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Load folder
+      </button>
+    </div>
     <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="addFromFiles(this.files)"/>
+    <input type="file" id="folderInput" webkitdirectory style="display:none" onchange="addFromFolder(this.files)"/>
     <p style="font-size:.7rem;color:var(--muted);margin-top:7px;line-height:1.5;">
       Local files are compressed and embedded as base64 — fine for local preview. For client sharing, upload images to a server and use URLs.
     </p>
@@ -718,6 +725,20 @@ async function addFromFiles(files) {
     renderList();
   }
   document.getElementById('fileInput').value = '';
+}
+
+// ═══════════════════════════════════════
+//  ADD FROM FOLDER
+// ═══════════════════════════════════════
+async function addFromFolder(files) {
+  const images = [...files]
+    .filter(f => f.type.startsWith('image/'))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+  if (!images.length) { showToast('No images found in folder.'); return; }
+  showToast(`Loading ${images.length} image(s)…`);
+  await addFromFiles(images);
+  document.getElementById('folderInput').value = '';
 }
 
 // ═══════════════════════════════════════
