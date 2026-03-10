@@ -410,6 +410,20 @@ h1 span{color:var(--accent);}
 
     <div class="divider-or">or</div>
 
+    <!-- GitHub folder -->
+    <div class="add-row">
+      <input type="url" id="ghFolderUrl" placeholder="https://github.com/user/repo/tree/main/folder" />
+      <button class="btn" onclick="addFromGitHubFolder()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        From GitHub
+      </button>
+    </div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:7px;margin-bottom:10px;line-height:1.5;">
+      Paste a GitHub folder URL — images are added as raw URLs, no download needed.
+    </p>
+
+    <div class="divider-or">or</div>
+
     <div style="display:flex;gap:8px;">
       <button class="btn btn-file" style="flex:1;justify-content:center;" onclick="document.getElementById('fileInput').click()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -725,6 +739,64 @@ async function addFromFiles(files) {
     renderList();
   }
   document.getElementById('fileInput').value = '';
+}
+
+// ═══════════════════════════════════════
+//  ADD FROM GITHUB FOLDER
+// ═══════════════════════════════════════
+function parseGitHubUrl(url) {
+  try {
+    const parts = new URL(url).pathname.split('/').filter(Boolean);
+    // parts: [owner, repo, 'tree', branch, ...path]
+    if (parts.length < 2) return null;
+    const owner  = parts[0];
+    const repo   = parts[1];
+    const branch = parts[2] === 'tree' ? parts[3] : 'main';
+    const path   = parts[2] === 'tree' ? parts.slice(4).join('/') : '';
+    return { owner, repo, branch, path };
+  } catch { return null; }
+}
+
+async function addFromGitHubFolder() {
+  const raw = document.getElementById('ghFolderUrl').value.trim();
+  if (!raw) { showToast('Enter a GitHub folder URL.'); return; }
+
+  const parsed = parseGitHubUrl(raw);
+  if (!parsed) { showToast('Invalid GitHub URL.'); return; }
+
+  const { owner, repo, branch, path } = parsed;
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+
+  showToast('Fetching folder…');
+  try {
+    const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github+json' } });
+    if (res.status === 403) throw new Error('GitHub rate limit hit — try again in a minute.');
+    if (res.status === 404) throw new Error('Folder not found. Check the URL and branch name.');
+    if (!res.ok) throw new Error(`GitHub API: HTTP ${res.status}`);
+
+    const files = await res.json();
+    if (!Array.isArray(files)) throw new Error('Expected a folder, got a single file.');
+
+    const imgExts = /\.(jpe?g|png|webp|gif|avif|tiff?)$/i;
+    const images = files
+      .filter(f => f.type === 'file' && imgExts.test(f.name))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+    if (!images.length) { showToast('No images found in that folder.'); return; }
+
+    images.forEach(f => pushItem({
+      url:      f.download_url,
+      label:    f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
+      isBase64: false,
+      sizeBytes: 0
+    }));
+
+    if (selectedIdx === -1 && items.length) selectItem(0);
+    renderList();
+    showToast(`Added ${images.length} image(s) from GitHub ✓`);
+  } catch(e) {
+    showToast(`Failed: ${e.message}`);
+  }
 }
 
 // ═══════════════════════════════════════
