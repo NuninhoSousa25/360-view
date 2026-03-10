@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>360° Playlist Builder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0c0c;
+  --surface:#161616;
+  --surface2:#1f1f1f;
+  --surface3:#272727;
+  --border:rgba(255,255,255,0.07);
+  --border-hover:rgba(255,255,255,0.14);
+  --accent:#c8a96e;
+  --accent-dim:rgba(200,169,110,0.12);
+  --accent-glow:rgba(200,169,110,0.25);
+  --text:#e8e4dc;
+  --muted:rgba(232,228,220,0.38);
+  --danger:#d9614e;
+  --danger-dim:rgba(217,97,78,0.12);
+  --radius:7px;
+}
+
+html,body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+}
+
+/* grain overlay */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.5;
+}
+
+/* ── LAYOUT ──────────────────────────────── */
+.shell{
+  position:relative;z-index:1;
+  max-width:780px;
+  margin:0 auto;
+  padding:48px 24px 80px;
+}
+
+/* ── HEADER ──────────────────────────────── */
+header{margin-bottom:40px;}
+.eyebrow{
+  font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:8px;
+}
+h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.2rem,6vw,3.4rem);
+  letter-spacing:.1em;
+  line-height:1;
+  color:var(--text);
+}
+h1 span{color:var(--accent);}
+.subtitle{
+  margin-top:10px;
+  font-size:.85rem;
+  color:var(--muted);
+  font-weight:300;
+  line-height:1.6;
+}
+
+/* ── SECTION TITLE ───────────────────────── */
+.section-label{
+  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.section-label::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* ── PLAYLIST TITLE ──────────────────────── */
+.title-row{margin-bottom:28px;}
+.field-wrap{position:relative;}
+.field-wrap input{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:.92rem;
+  padding:12px 16px;
+  outline:none;
+  transition:border-color .2s;
+}
+.field-wrap input:focus{border-color:var(--accent);}
+.field-wrap input::placeholder{color:var(--muted);}
+
+/* ── ADD IMAGE ROW ───────────────────────── */
+.add-section{margin-bottom:28px;}
+.add-row{display:flex;gap:8px;align-items:stretch;}
+.add-row input{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:.88rem;
+  padding:11px 14px;
+  outline:none;
+  transition:border-color .2s;
+}
+.add-row input:focus{border-color:var(--accent);}
+.add-row input::placeholder{color:var(--muted);}
+
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:11px 18px;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--surface2);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:.83rem;
+  font-weight:500;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background .18s,border-color .18s,color .18s;
+  letter-spacing:.02em;
+}
+.btn:hover{background:var(--surface3);border-color:var(--border-hover);}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+
+.btn-accent{
+  background:var(--accent);color:#0c0c0c;
+  border-color:var(--accent);
+}
+.btn-accent:hover{background:#d4b87a;border-color:#d4b87a;}
+
+.btn-file{
+  border-style:dashed;
+}
+.btn-file:hover{background:var(--accent-dim);border-color:rgba(200,169,110,0.4);color:var(--accent);}
+
+.divider-or{
+  text-align:center;
+  font-size:.72rem;letter-spacing:.1em;
+  color:var(--muted);
+  margin:10px 0;
+  position:relative;
+}
+.divider-or::before,.divider-or::after{
+  content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);
+}
+.divider-or::before{left:0;}
+.divider-or::after{right:0;}
+
+/* ── CARD LIST ───────────────────────────── */
+#cardList{
+  display:flex;flex-direction:column;gap:8px;
+  min-height:60px;
+  margin-bottom:32px;
+}
+
+.empty-state{
+  border:1px dashed var(--border);
+  border-radius:var(--radius);
+  padding:40px 20px;
+  text-align:center;
+  color:var(--muted);
+  font-size:.82rem;
+  letter-spacing:.04em;
+}
+
+/* ── IMAGE CARD ──────────────────────────── */
+.img-card{
+  display:grid;
+  grid-template-columns:64px 1fr auto;
+  gap:12px;
+  align-items:center;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:10px 14px;
+  animation:slideIn .22s ease;
+  cursor:grab;
+  transition:border-color .18s,background .18s;
+}
+.img-card:active{cursor:grabbing;}
+.img-card.drag-over{border-color:var(--accent);background:var(--accent-dim);}
+.img-card.dragging{opacity:.35;}
+
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+
+.card-thumb{
+  width:64px;height:40px;
+  border-radius:4px;
+  overflow:hidden;
+  background:var(--surface3);
+  flex-shrink:0;
+}
+.card-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.card-thumb .no-preview{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+.card-body{min-width:0;}
+.card-label-input{
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid transparent;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:.85rem;
+  font-weight:500;
+  padding:2px 0;
+  outline:none;
+  transition:border-color .18s;
+}
+.card-label-input:focus{border-bottom-color:var(--accent);}
+.card-label-input::placeholder{color:var(--muted);font-weight:300;font-style:italic;}
+.card-url{
+  font-size:.7rem;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-top:3px;
+}
+
+.card-actions{display:flex;gap:4px;flex-shrink:0;}
+.icon-btn{
+  width:30px;height:30px;
+  border:1px solid transparent;
+  border-radius:5px;
+  background:transparent;
+  color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.icon-btn:hover{background:var(--surface3);color:var(--text);border-color:var(--border);}
+.icon-btn.del:hover{background:var(--danger-dim);color:var(--danger);border-color:rgba(217,97,78,0.25);}
+.icon-btn svg{width:13px;height:13px;}
+
+/* ── EXPORT SECTION ──────────────────────── */
+.export-section{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:24px 28px;
+}
+.export-section h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.3rem;letter-spacing:.12em;
+  color:var(--accent);margin-bottom:4px;
+}
+.export-section p{
+  font-size:.8rem;color:var(--muted);margin-bottom:20px;line-height:1.6;
+}
+.export-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* ── PREVIEW JSON ────────────────────────── */
+#jsonPreview{
+  margin-top:16px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  font-family:'Courier New',monospace;
+  font-size:.72rem;
+  color:var(--muted);
+  line-height:1.6;
+  max-height:180px;
+  overflow-y:auto;
+  display:none;
+  white-space:pre;
+}
+#jsonPreview.show{display:block;}
+
+/* ── COUNT BADGE ─────────────────────────── */
+.count-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:20px;padding:0 6px;
+  background:var(--accent-dim);
+  color:var(--accent);
+  border-radius:20px;
+  font-size:.68rem;font-weight:500;
+  margin-left:6px;
+}
+
+/* ── TOAST ───────────────────────────────── */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:10px 20px;
+  font-size:.8rem;letter-spacing:.04em;
+  color:var(--text);
+  opacity:0;pointer-events:none;
+  transition:opacity .25s,transform .25s;
+  z-index:999;white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HEADER -->
+  <header>
+    <div class="eyebrow">360° Tools</div>
+    <h1>Playlist <span>Builder</span></h1>
+    <p class="subtitle">Compose a playlist of 360° panoramas, export as a single JSON file,<br>upload it to your server, and share one URL with your client.</p>
+  </header>
+
+  <!-- PLAYLIST TITLE -->
+  <div class="title-row">
+    <div class="section-label">Playlist name</div>
+    <div class="field-wrap">
+      <input type="text" id="playlistTitle" placeholder="e.g. Client Tour — Building A" />
+    </div>
+  </div>
+
+  <!-- ADD IMAGES -->
+  <div class="add-section">
+    <div class="section-label">Add images <span class="count-badge" id="countBadge">0</span></div>
+
+    <!-- paste URL -->
+    <div class="add-row">
+      <input type="url" id="urlInput" placeholder="Paste image URL — https://yourserver.com/photo.jpg" />
+      <button class="btn btn-accent" onclick="addFromUrl()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add URL
+      </button>
+    </div>
+
+    <div class="divider-or">or</div>
+
+    <!-- load from device -->
+    <button class="btn btn-file" style="width:100%;justify-content:center;" onclick="document.getElementById('fileInput').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Load images from device
+    </button>
+    <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="addFromFiles(this.files)"/>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:7px;line-height:1.5;">
+      ⚠️ Local files will be embedded as base64 in the JSON — best for previewing. For sharing with clients, upload to your server first and use URLs instead.
+    </p>
+  </div>
+
+  <!-- CARD LIST -->
+  <div class="section-label">Images in playlist</div>
+  <div id="cardList">
+    <div class="empty-state" id="emptyState">No images yet — add some above.</div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="export-section">
+    <h2>Export Playlist</h2>
+    <p>Generate a single shareable URL with your entire playlist embedded — no server fetch, no CORS issues. Or download the JSON to host it yourself.</p>
+
+    <!-- VIEWER URL INPUT -->
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Your 360viewer.html URL</label>
+      <input type="url" id="viewerUrlInput" value="https://nuno-sousa.com/repository/uploads/360viewer.html"
+        placeholder="https://yourserver.com/360viewer.html"
+        style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:10px 13px;outline:none;transition:border-color .2s;"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''" />
+    </div>
+
+    <!-- GENERATED SHARE URL -->
+    <div id="shareUrlWrap" style="display:none;margin-bottom:16px;">
+      <label style="display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Share URL <span style="color:var(--accent);font-size:.65rem;">(ready to send to client)</span></label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="shareUrlOutput" readonly
+          style="flex:1;background:var(--bg);border:1px solid rgba(200,169,110,0.3);border-radius:var(--radius);color:var(--accent);font-family:'Courier New',monospace;font-size:.72rem;padding:10px 13px;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" />
+        <button class="btn btn-accent" onclick="copyShareUrl()" style="flex-shrink:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div id="urlLengthWarn" style="font-size:.72rem;color:var(--muted);margin-top:6px;"></div>
+    </div>
+
+    <div class="export-row">
+      <button class="btn btn-accent" onclick="generateShareUrl()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Generate Share URL
+      </button>
+      <button class="btn" onclick="downloadJSON()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download JSON
+      </button>
+      <button class="btn" onclick="togglePreview()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview JSON
+      </button>
+    </div>
+    <pre id="jsonPreview"></pre>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+let items = []; // { id, url, label, isBase64 }
+let dragSrc = null;
+
+// ═══════════════════════════════════════
+//  ADD FROM URL
+// ═══════════════════════════════════════
+function addFromUrl() {
+  const input = document.getElementById('urlInput');
+  const raw = input.value.trim();
+  if (!raw) return;
+
+  // support comma or newline separated batch paste
+  const urls = raw.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 4);
+  urls.forEach(url => pushItem({ url, label: guessLabel(url), isBase64: false }));
+  input.value = '';
+  renderList();
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addFromUrl();
+});
+
+// ═══════════════════════════════════════
+//  ADD FROM FILES (base64)
+// ═══════════════════════════════════════
+function addFromFiles(files) {
+  [...files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      pushItem({ url: e.target.result, label: file.name.replace(/\.[^.]+$/, ''), isBase64: true });
+      renderList();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('fileInput').value = '';
+}
+
+// ═══════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════
+function pushItem(data) {
+  items.push({ id: Date.now() + Math.random(), ...data });
+}
+
+function guessLabel(url) {
+  try {
+    const parts = new URL(url).pathname.split('/');
+    return parts[parts.length - 1].replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') || '';
+  } catch { return ''; }
+}
+
+function removeItem(id) {
+  items = items.filter(i => i.id !== id);
+  renderList();
+}
+
+function moveItem(fromIdx, toIdx) {
+  const [item] = items.splice(fromIdx, 1);
+  items.splice(toIdx, 0, item);
+  renderList();
+}
+
+// ═══════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════
+function renderList() {
+  const list = document.getElementById('cardList');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('countBadge').textContent = items.length;
+
+  if (!items.length) {
+    list.innerHTML = '';
+    list.appendChild(empty);
+    return;
+  }
+
+  list.innerHTML = '';
+  items.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'img-card';
+    card.draggable = true;
+    card.dataset.idx = idx;
+
+    // thumb
+    const thumb = document.createElement('div');
+    thumb.className = 'card-thumb';
+    if (item.url) {
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.onerror = () => { thumb.innerHTML = '<div class="no-preview">No preview</div>'; };
+      thumb.appendChild(img);
+    } else {
+      thumb.innerHTML = '<div class="no-preview">No preview</div>';
+    }
+
+    // body
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const labelInput = document.createElement('input');
+    labelInput.className = 'card-label-input';
+    labelInput.type = 'text';
+    labelInput.value = item.label;
+    labelInput.placeholder = 'Add a label…';
+    labelInput.oninput = e => { items[idx].label = e.target.value; };
+
+    const urlDiv = document.createElement('div');
+    urlDiv.className = 'card-url';
+    urlDiv.textContent = item.isBase64 ? '📁 Local file (base64)' : item.url;
+
+    body.appendChild(labelInput);
+    body.appendChild(urlDiv);
+
+    // actions
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+
+    // drag handle
+    const grip = document.createElement('div');
+    grip.className = 'icon-btn';
+    grip.title = 'Drag to reorder';
+    grip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>`;
+    grip.style.cursor = 'grab';
+
+    const del = document.createElement('div');
+    del.className = 'icon-btn del';
+    del.title = 'Remove';
+    del.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+    del.onclick = () => removeItem(item.id);
+
+    actions.appendChild(grip);
+    actions.appendChild(del);
+
+    card.appendChild(thumb);
+    card.appendChild(body);
+    card.appendChild(actions);
+
+    // drag events
+    card.addEventListener('dragstart', e => {
+      dragSrc = idx;
+      setTimeout(() => card.classList.add('dragging'), 0);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      document.querySelectorAll('.img-card').forEach(c => c.classList.remove('dragging','drag-over'));
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      document.querySelectorAll('.img-card').forEach(c => c.classList.remove('drag-over'));
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrc !== null && dragSrc !== idx) moveItem(dragSrc, idx);
+      dragSrc = null;
+    });
+
+    list.appendChild(card);
+  });
+
+  // update preview if open
+  if (document.getElementById('jsonPreview').classList.contains('show')) updatePreview();
+}
+
+// ═══════════════════════════════════════
+//  JSON BUILD
+// ═══════════════════════════════════════
+function buildJSON() {
+  const title = document.getElementById('playlistTitle').value.trim() || 'My 360° Tour';
+  return {
+    title,
+    created: new Date().toISOString(),
+    images: items.map(i => ({
+      url: i.url,
+      label: i.label || undefined
+    }))
+  };
+}
+
+function generateShareUrl() {
+  if (!items.length) { showToast('Add at least one image first.'); return; }
+  const viewerUrl = document.getElementById('viewerUrlInput').value.trim();
+  if (!viewerUrl) { showToast('Enter your 360viewer.html URL first.'); return; }
+
+  const json = JSON.stringify(buildJSON());
+  const encoded = btoa(encodeURIComponent(json));
+  const fullUrl = `${viewerUrl}?data=${encoded}`;
+
+  document.getElementById('shareUrlOutput').value = fullUrl;
+  document.getElementById('shareUrlWrap').style.display = 'block';
+
+  // Warn if URL is very long (some browsers/servers cap at ~8000 chars)
+  const warn = document.getElementById('urlLengthWarn');
+  if (fullUrl.length > 8000) {
+    warn.textContent = `⚠️ URL is ${fullUrl.length} chars — very long URLs may not work in all browsers. Consider hosting the JSON instead.`;
+    warn.style.color = '#c8a96e';
+  } else {
+    warn.textContent = `✅ URL length: ${fullUrl.length} chars — looks good.`;
+    warn.style.color = 'rgba(232,228,220,0.35)';
+  }
+
+  // scroll into view
+  document.getElementById('shareUrlWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyShareUrl() {
+  const val = document.getElementById('shareUrlOutput').value;
+  if (!val) return;
+  navigator.clipboard.writeText(val)
+    .then(() => showToast('Share URL copied ✓'))
+    .catch(() => showToast('Copy failed — select and copy manually.'));
+}
+
+function downloadJSON() {
+  if (!items.length) { showToast('Add at least one image first.'); return; }
+  const data = JSON.stringify(buildJSON(), null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const slug = (document.getElementById('playlistTitle').value.trim() || 'playlist')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  a.download = slug + '.json';
+  a.click();
+  showToast('JSON downloaded ✓');
+}
+
+function togglePreview() {
+  const pre = document.getElementById('jsonPreview');
+  if (pre.classList.contains('show')) { pre.classList.remove('show'); return; }
+  updatePreview();
+  pre.classList.add('show');
+}
+
+function updatePreview() {
+  const pre = document.getElementById('jsonPreview');
+  const obj = buildJSON();
+  // truncate base64 for display
+  const display = JSON.parse(JSON.stringify(obj));
+  display.images.forEach(i => {
+    if (i.url && i.url.startsWith('data:')) i.url = i.url.substring(0, 60) + '… [base64]';
+  });
+  pre.textContent = JSON.stringify(display, null, 2);
+}
+
+function copyJSON() {
+  if (!items.length) { showToast('Add at least one image first.'); return; }
+  navigator.clipboard.writeText(JSON.stringify(buildJSON(), null, 2))
+    .then(() => showToast('Copied to clipboard ✓'))
+    .catch(() => showToast('Copy failed — try downloading instead.'));
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
