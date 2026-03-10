@@ -1,5 +1,9 @@
 # 360° Viewer + Playlist Builder
 
+https://nuninhosousa25.github.io/360-view/playlist.json
+https://nuninhosousa25.github.io/360-view/
+https://nuninhosousa25.github.io/360-view/360builder.html
+
 > **Work in progress** — prototype, expect rough edges.
 
 A self-contained, zero-dependency pair of HTML tools for sharing 360° equirectangular panoramas with clients. No backend required.
