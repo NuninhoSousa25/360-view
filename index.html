@@ -297,7 +297,7 @@
 <div id="setup">
   <div class="setup-card">
     <h1>360° Viewer</h1>
-    <p>Load a playlist JSON, paste image URLs, or use <code>?playlist=</code> / <code>?urls=</code> params.</p>
+    <p>Load a playlist JSON, paste image URLs, or use <code>?playlist=</code> / <code>?url=</code> / <code>?urls=</code> params.</p>
 
     <label style="margin-bottom:8px;">Load local playlist JSON (for testing)</label>
     <button class="btn-load" style="margin-bottom:8px;background:var(--surface2);color:var(--text);border:1px dashed rgba(255,255,255,0.15);" onclick="document.getElementById('jsonFileInput').click()">
@@ -316,6 +316,7 @@
     <textarea id="urlInput" placeholder="https://example.com/panorama1.jpg&#10;https://example.com/panorama2.jpg"></textarea>
     <div class="hint">
       💡 Params: <code>?url=…</code> &nbsp;·&nbsp; <code>?urls=url1,url2</code> &nbsp;·&nbsp; <code>?playlist=https://…/tour.json</code>
+      <br>To build a playlist: use <code>360builder.html</code>, download the JSON, host it, then link here.
     </div>
 
     <details style="margin-top:14px;">
@@ -403,13 +404,9 @@ function dbg(msg, type = 'info') {
   const multi    = params.get('urls');
   const playlist = params.get('playlist');
 
-  const data = params.get('data');
-  dbg(`Page loaded. Params — url:${single} urls:${multi} playlist:${playlist} data:${data ? '[encoded]' : 'null'}`);
+  dbg(`Page loaded. Params — url:${single} urls:${multi} playlist:${playlist}`);
 
-  if (data) {
-    dbg('Encoded data param found — decoding…');
-    loadFromDataParam(data);
-  } else if (playlist) {
+  if (playlist) {
     dbg(`Fetching playlist from: ${playlist}`);
     await loadPlaylist(playlist);
   } else if (single) {
@@ -444,23 +441,6 @@ async function loadPlaylist(jsonUrl) {
     }
   } catch(e) {
     dbg(`loadPlaylist failed: ${e.message}`, 'error');
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-//  LOAD FROM ENCODED DATA PARAM
-// ═══════════════════════════════════════════════════════════
-function loadFromDataParam(encoded) {
-  try {
-    const json = decodeURIComponent(atob(encoded));
-    const data = JSON.parse(json);
-    dbg(`Decoded OK. Title: "${data.title || '—'}" | Images: ${(data.images||[]).length}`, 'ok');
-    const urls = (data.images || []).map(i => (typeof i === 'string' ? i : i.url)).filter(Boolean);
-    dbg(`Valid URLs: ${urls.length}`, urls.length ? 'ok' : 'error');
-    if (urls.length) startViewer(urls);
-    else dbg('No valid URLs found in encoded data.', 'error');
-  } catch(e) {
-    dbg(`Decode failed: ${e.message}`, 'error');
   }
 }
 
@@ -577,7 +557,7 @@ function loadImage(idx) {
   setActiveThumb(idx);
 
   const loader = new THREE.TextureLoader();
-  // loader.setCrossOrigin removed — not needed for same-CDN images;
+  loader.setCrossOrigin('anonymous');
   dbg(`Loading image [${idx+1}/${images.length}]: ${url}`);
   loader.load(
     url,
