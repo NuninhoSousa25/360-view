@@ -577,7 +577,7 @@ function loadImage(idx) {
   setActiveThumb(idx);
 
   const loader = new THREE.TextureLoader();
-  loader.setCrossOrigin('anonymous');
+  // loader.setCrossOrigin removed — not needed for same-CDN images;
   dbg(`Loading image [${idx+1}/${images.length}]: ${url}`);
   loader.load(
     url,
