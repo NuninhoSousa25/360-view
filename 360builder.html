@@ -24,6 +24,8 @@
   --danger-dim:rgba(217,97,78,0.12);
   --good:rgba(126,201,154,0.9);
   --radius:7px;
+  --header-h:68px;
+  --bar-h:64px;
 }
 
 html,body{
@@ -33,6 +35,8 @@ html,body{
   font-family:'DM Sans',sans-serif;
 }
 
+body{padding-bottom:calc(var(--bar-h) + 20px);}
+
 body::before{
   content:'';
   position:fixed;inset:0;
@@ -40,18 +44,54 @@ body::before{
   pointer-events:none;z-index:0;opacity:.5;
 }
 
-/* ── PAGE / LAYOUT ───────────────────────── */
-.page{
-  position:relative;z-index:1;
-  max-width:1200px;
-  margin:0 auto;
-  padding:48px 24px 80px;
+/* ── SITE HEADER ──────────────────────── */
+.site-header{
+  position:sticky;top:0;z-index:50;
+  height:var(--header-h);
+  background:rgba(12,12,12,0.88);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 24px;gap:20px;
 }
 
+.header-brand{flex-shrink:0;}
+.header-eyebrow{
+  font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);line-height:1;margin-bottom:3px;
+}
+.header-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.55rem;letter-spacing:.12em;line-height:1;color:var(--text);
+}
+.header-title span{color:var(--accent);}
+
+.header-title-wrap{
+  flex:1;display:flex;justify-content:flex-end;
+}
+.header-title-input{
+  width:100%;max-width:420px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;
+  padding:9px 14px;outline:none;transition:border-color .2s;
+}
+.header-title-input:focus{border-color:var(--accent);}
+.header-title-input::placeholder{color:var(--muted);}
+
+/* ── PAGE WRAPPER ─────────────────────── */
+.page{
+  position:relative;z-index:1;
+  max-width:1240px;
+  margin:0 auto;
+  padding:24px 24px 0;
+}
+
+/* ── TWO-COLUMN LAYOUT ────────────────── */
 .layout{
   display:grid;
   grid-template-columns:1fr 320px;
-  gap:28px;
+  gap:24px;
   align-items:start;
 }
 
@@ -60,16 +100,22 @@ body::before{
   .right-col{position:static !important;}
 }
 
-/* ── RIGHT COLUMN ────────────────────────── */
+/* ── RIGHT COLUMN ─────────────────────── */
 .right-col{
   position:sticky;
-  top:32px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+  top:calc(var(--header-h) + 12px);
+  display:flex;flex-direction:column;gap:10px;
 }
 
-/* ── COLLAPSIBLE PANEL ───────────────────── */
+/* ── SURFACE CARD ─────────────────────── */
+.surface-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:18px 20px;
+}
+
+/* ── COLLAPSIBLE PANEL ────────────────── */
 .panel{
   background:var(--surface);
   border:1px solid var(--border);
@@ -80,74 +126,98 @@ body::before{
   padding:13px 18px;
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
-  cursor:pointer;
-  user-select:none;
+  cursor:pointer;user-select:none;
   transition:background .15s;
 }
 .panel-head:hover{background:var(--surface2);}
 .panel-title{
-  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);
 }
 .panel-chevron{
-  font-size:.6rem;color:var(--muted);
+  font-size:.58rem;color:var(--muted);
   transition:transform .2s;
 }
 .panel-chevron.open{transform:rotate(90deg);}
 .panel-body{padding:16px 18px;}
 .panel-body.hidden{display:none;}
 
-/* ── PREVIEW ─────────────────────────────── */
-.preview-img-wrap{
+/* ── PANEL INPUT ──────────────────────── */
+.panel-input{
   width:100%;
-  aspect-ratio:2/1;
-  background:var(--surface2);
-  border-radius:6px;
-  overflow:hidden;
-  position:relative;
-  margin-bottom:10px;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;
+  padding:8px 11px;outline:none;transition:border-color .2s;
 }
-.preview-img-wrap img{
-  width:100%;height:100%;
-  object-fit:cover;
-  display:none;
+.panel-input:focus{border-color:var(--accent);}
+.panel-input::placeholder{color:var(--muted);}
+
+/* ── SECTION LABEL ────────────────────── */
+.section-label{
+  font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
 }
-.preview-empty{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--muted);
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── ADD IMAGES CARD ──────────────────── */
+.add-row{display:flex;gap:8px;margin-bottom:10px;}
+.add-row input{
+  flex:1;min-width:0;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;
+  padding:10px 13px;outline:none;transition:border-color .2s;
 }
-.preview-footer{
-  display:flex;justify-content:space-between;align-items:baseline;
-  gap:8px;
-}
-.preview-label{
-  font-size:.85rem;font-weight:500;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:180px;
-}
-.preview-size{
-  font-size:.68rem;color:var(--muted);
-  font-family:'Courier New',monospace;flex-shrink:0;
-}
-.preview-counter{
-  font-size:.65rem;color:var(--muted);margin-top:3px;
+.add-row input:focus{border-color:var(--accent);}
+.add-row input::placeholder{color:var(--muted);}
+
+.add-divider{
+  border:none;border-top:1px solid var(--border);
+  margin:12px 0;
 }
 
-/* ── OPT CONTROLS ────────────────────────── */
+.file-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* ── SETTINGS TOGGLE BUTTON ───────────── */
+.btn-settings-toggle{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:8px 11px;
+  border:1px dashed var(--border);border-radius:var(--radius);
+  background:transparent;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:.75rem;
+  cursor:pointer;white-space:nowrap;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.btn-settings-toggle:hover{
+  background:var(--surface3);color:var(--text);border-color:var(--border-hover);
+}
+.btn-settings-toggle.active{
+  border-color:rgba(200,169,110,0.4);color:var(--accent);
+  background:var(--accent-dim);
+}
+
+/* ── UPLOAD SETTINGS INLINE ───────────── */
+#uploadSettingsBody{
+  display:none;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+#uploadSettingsBody.open{display:block;}
+
+/* ── OPT CONTROLS ─────────────────────── */
 .opt-grid{
   display:grid;grid-template-columns:1fr 1fr;gap:10px;
   margin-bottom:12px;
 }
 .opt-field label{
-  display:block;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;
+  display:block;font-size:.63rem;letter-spacing:.08em;text-transform:uppercase;
   color:var(--muted);margin-bottom:5px;
 }
 .opt-field select{
   width:100%;
   background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;
   padding:7px 10px;outline:none;cursor:pointer;appearance:none;
 }
 .opt-field select option{background:var(--bg);}
@@ -166,85 +236,24 @@ body::before{
 .opt-check-row{
   display:flex;align-items:center;gap:8px;
   font-size:.78rem;color:var(--muted);
-  margin-bottom:12px;cursor:pointer;
+  margin-bottom:10px;cursor:pointer;
 }
 .opt-check-row input[type=checkbox]{accent-color:var(--accent);}
 
-/* ── STATS ───────────────────────────────── */
-.stats-block{
-  border-top:1px solid var(--border);
-  padding-top:12px;
-  display:flex;flex-direction:column;gap:5px;
+/* ── INLINE STATS ─────────────────────── */
+.inline-stats{
+  font-size:.7rem;color:var(--muted);
+  margin-top:8px;
 }
-.stats-row{
-  display:flex;justify-content:space-between;
-  font-size:.72rem;
-}
-.stats-key{color:var(--muted);}
-.stats-val{font-family:'Courier New',monospace;}
-.stats-val.good{color:var(--good);}
-.stats-val.warn{color:var(--accent);}
-.stats-val.bad{color:var(--danger);}
+.inline-stats .stat-good{color:var(--good);}
+.inline-stats .stat-warn{color:var(--accent);}
+.inline-stats .stat-bad{color:var(--danger);}
 
-/* ── IMPORT ROW ──────────────────────────── */
-.import-input-row{display:flex;gap:6px;}
-.import-input-row input{
-  flex:1;min-width:0;
-  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;
-  padding:8px 11px;outline:none;transition:border-color .2s;
-}
-.import-input-row input:focus{border-color:var(--accent);}
-.import-input-row input::placeholder{color:var(--muted);}
-
-/* ── HEADER ──────────────────────────────── */
-header{margin-bottom:36px;}
-.eyebrow{
-  font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:8px;
-}
-h1{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(2.2rem,5vw,3.4rem);
-  letter-spacing:.1em;line-height:1;color:var(--text);
-}
-h1 span{color:var(--accent);}
-.subtitle{
-  margin-top:10px;font-size:.85rem;
-  color:var(--muted);font-weight:300;line-height:1.6;
+.add-note{
+  font-size:.68rem;color:var(--muted);margin-top:10px;line-height:1.55;
 }
 
-/* ── SECTION LABEL ───────────────────────── */
-.section-label{
-  font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;
-}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ── PLAYLIST TITLE ──────────────────────── */
-.title-row{margin-bottom:24px;}
-.field-wrap input{
-  width:100%;
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;
-  padding:12px 16px;outline:none;transition:border-color .2s;
-}
-.field-wrap input:focus{border-color:var(--accent);}
-.field-wrap input::placeholder{color:var(--muted);}
-
-/* ── ADD IMAGE ROW ───────────────────────── */
-.add-section{margin-bottom:24px;}
-.add-row{display:flex;gap:8px;}
-.add-row input{
-  flex:1;
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;
-  padding:11px 14px;outline:none;transition:border-color .2s;
-}
-.add-row input:focus{border-color:var(--accent);}
-.add-row input::placeholder{color:var(--muted);}
-
-/* ── BUTTONS ─────────────────────────────── */
+/* ── BUTTONS ──────────────────────────── */
 .btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:10px 16px;
@@ -261,20 +270,35 @@ h1 span{color:var(--accent);}
 .btn-sm{padding:7px 12px;font-size:.78rem;}
 .btn-file{border-style:dashed;}
 .btn-file:hover{background:var(--accent-dim);border-color:rgba(200,169,110,0.4);color:var(--accent);}
-
-.divider-or{
-  text-align:center;font-size:.72rem;letter-spacing:.1em;color:var(--muted);
-  margin:10px 0;position:relative;
+.btn-icon{
+  width:32px;height:32px;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface2);color:var(--text);
+  cursor:pointer;transition:background .18s,border-color .18s;flex-shrink:0;
 }
-.divider-or::before,.divider-or::after{
-  content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);
-}
-.divider-or::before{left:0;}.divider-or::after{right:0;}
+.btn-icon:hover{background:var(--surface3);border-color:var(--border-hover);}
+.btn-icon:disabled{opacity:.35;cursor:not-allowed;}
+.btn-icon svg{width:14px;height:14px;}
 
-/* ── CARD LIST ───────────────────────────── */
+/* ── CARD LIST ────────────────────────── */
+.list-header{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:10px;
+}
+.list-header-label{
+  font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.count-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:20px;padding:0 6px;
+  background:var(--accent-dim);color:var(--accent);
+  border-radius:20px;font-size:.68rem;font-weight:500;
+}
+
 #cardList{
   display:flex;flex-direction:column;gap:6px;
-  min-height:60px;margin-bottom:28px;
+  min-height:60px;margin-bottom:18px;
 }
 .empty-state{
   border:1px dashed var(--border);border-radius:var(--radius);
@@ -282,9 +306,9 @@ h1 span{color:var(--accent);}
   font-size:.82rem;letter-spacing:.04em;
 }
 
-/* ── IMAGE CARD ──────────────────────────── */
+/* ── IMAGE CARD ───────────────────────── */
 .img-card{
-  display:grid;grid-template-columns:64px 1fr auto;
+  display:grid;grid-template-columns:56px 1fr auto;
   gap:10px;align-items:center;
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   padding:8px 12px;
@@ -299,13 +323,13 @@ h1 span{color:var(--accent);}
 @keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
 
 .card-thumb{
-  width:64px;height:40px;border-radius:4px;
+  width:56px;height:36px;border-radius:4px;
   overflow:hidden;background:var(--surface3);flex-shrink:0;
 }
 .card-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .card-thumb .no-preview{
   width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+  font-size:.5rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
 }
 .card-body{min-width:0;}
 .card-label-input{
@@ -317,13 +341,13 @@ h1 span{color:var(--accent);}
 .card-label-input:focus{border-bottom-color:var(--accent);}
 .card-label-input::placeholder{color:var(--muted);font-weight:300;font-style:italic;}
 .card-meta{
-  font-size:.68rem;color:var(--muted);
+  font-size:.67rem;color:var(--muted);
   display:flex;align-items:center;gap:6px;margin-top:2px;
   white-space:nowrap;overflow:hidden;
 }
 .card-url-text{overflow:hidden;text-overflow:ellipsis;}
 .size-badge{
-  font-size:.62rem;color:var(--accent);
+  font-size:.6rem;color:var(--accent);
   background:var(--accent-dim);border-radius:3px;
   padding:1px 5px;white-space:nowrap;flex-shrink:0;
 }
@@ -339,158 +363,174 @@ h1 span{color:var(--accent);}
 .icon-btn.del:hover{background:var(--danger-dim);color:var(--danger);border-color:rgba(217,97,78,0.25);}
 .icon-btn svg{width:12px;height:12px;}
 
-/* ── EXPORT SECTION ──────────────────────── */
-.export-section{
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;
-}
-.export-section h2{
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.12em;
-  color:var(--accent);margin-bottom:4px;
-}
-.export-section p{font-size:.78rem;color:var(--muted);margin-bottom:16px;line-height:1.6;}
-.export-row{display:flex;gap:8px;flex-wrap:wrap;}
-
+/* ── JSON PREVIEW ─────────────────────── */
 #jsonPreview{
-  margin-top:14px;background:var(--bg);border:1px solid var(--border);
+  background:var(--bg);border:1px solid var(--border);
   border-radius:var(--radius);padding:12px 14px;
   font-family:'Courier New',monospace;font-size:.7rem;color:var(--muted);
   line-height:1.6;max-height:160px;overflow-y:auto;display:none;white-space:pre;
 }
 #jsonPreview.show{display:block;}
 
-/* ── BADGE / TOAST ───────────────────────── */
-.count-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:20px;height:20px;padding:0 6px;
-  background:var(--accent-dim);color:var(--accent);
-  border-radius:20px;font-size:.68rem;font-weight:500;margin-left:6px;
+/* ── PREVIEW PANEL ────────────────────── */
+.preview-img-wrap{
+  width:100%;aspect-ratio:2/1;
+  background:var(--surface2);border-radius:6px;
+  overflow:hidden;position:relative;
 }
+.preview-img-wrap img{
+  width:100%;height:100%;object-fit:cover;display:none;
+}
+.preview-empty{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+.preview-nav{
+  display:flex;align-items:center;gap:8px;
+  margin-top:10px;
+}
+.preview-nav-center{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;
+}
+.preview-label{
+  font-size:.83rem;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;text-align:center;
+}
+.preview-counter{
+  font-size:.65rem;color:var(--muted);text-align:center;
+}
+
+/* ── IMPORT ROW ───────────────────────── */
+.import-input-row{display:flex;gap:6px;}
+.import-input-row input{
+  flex:1;min-width:0;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;
+  padding:8px 11px;outline:none;transition:border-color .2s;
+}
+.import-input-row input:focus{border-color:var(--accent);}
+.import-input-row input::placeholder{color:var(--muted);}
+
+.divider-or{
+  text-align:center;font-size:.7rem;letter-spacing:.1em;color:var(--muted);
+  margin:10px 0;position:relative;
+}
+.divider-or::before,.divider-or::after{
+  content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border);
+}
+.divider-or::before{left:0;}.divider-or::after{right:0;}
+
+/* ── EXPORT BAR (sticky bottom) ──────── */
+.export-bar{
+  position:fixed;bottom:0;left:0;right:0;height:var(--bar-h);z-index:50;
+  background:rgba(18,18,18,0.96);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 24px;gap:16px;
+}
+.export-bar-info{
+  display:flex;align-items:center;gap:10px;
+  flex:1;min-width:0;
+}
+#exportCount{
+  font-size:.85rem;font-weight:500;color:var(--text);
+}
+#exportSizeInfo{
+  font-size:.78rem;font-family:'Courier New',monospace;color:var(--muted);
+}
+#exportSizeInfo.good{color:var(--good);}
+#exportSizeInfo.warn{color:var(--accent);}
+#exportSizeInfo.bad{color:var(--danger);}
+.export-bar-actions{display:flex;gap:8px;flex-shrink:0;}
+
+/* ── TOAST ────────────────────────────── */
 #toast{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);
+  position:fixed;
+  bottom:calc(var(--bar-h) + 12px);
+  left:50%;transform:translateX(-50%) translateY(12px);
   background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
   padding:10px 20px;font-size:.8rem;letter-spacing:.04em;color:var(--text);
   opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
   z-index:999;white-space:nowrap;
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── STATS VALUES ─────────────────────── */
+.stats-val.good{color:var(--good);}
+.stats-val.warn{color:var(--accent);}
+.stats-val.bad{color:var(--danger);}
 </style>
 </head>
 <body>
+
+<!-- ══ STICKY SITE HEADER ════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-brand">
+    <div class="header-eyebrow">360° Tools</div>
+    <div class="header-title">Playlist <span>Builder</span></div>
+  </div>
+  <div class="header-title-wrap">
+    <input type="text" id="playlistTitle" class="header-title-input"
+           placeholder="Playlist title — e.g. Client Tour · Building A" />
+  </div>
+</header>
+
+<!-- ══ PAGE ══════════════════════════════════════════════ -->
 <div class="page">
 <div class="layout">
 
 <!-- ══ LEFT COLUMN ══════════════════════════════════════ -->
 <div class="left-col">
 
-  <header>
-    <div class="eyebrow">360° Tools</div>
-    <h1>Playlist <span>Builder</span></h1>
-    <p class="subtitle">Compose a playlist of 360° panoramas, download as JSON,<br>host it on your server and share one URL with your client.</p>
-  </header>
+  <!-- ADD IMAGES CARD -->
+  <div class="surface-card" style="margin-bottom:18px;">
 
-  <!-- PLAYLIST TITLE -->
-  <div class="title-row">
-    <div class="section-label">Playlist name</div>
-    <div class="field-wrap">
-      <input type="text" id="playlistTitle" placeholder="e.g. Client Tour — Building A" />
-    </div>
-  </div>
-
-  <!-- ADD IMAGES -->
-  <div class="add-section">
-    <div class="section-label">Add images <span class="count-badge" id="countBadge">0</span></div>
-
+    <!-- URL row -->
     <div class="add-row">
       <input type="url" id="urlInput" placeholder="Paste image URL — https://yourserver.com/photo.jpg" />
       <button class="btn btn-accent" onclick="addFromUrl()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add URL
+        + Add URL
       </button>
     </div>
 
-    <div class="divider-or">or</div>
-
-    <!-- GitHub folder -->
+    <!-- GitHub row -->
     <div class="add-row">
-      <input type="url" id="ghFolderUrl" placeholder="https://github.com/user/repo/tree/main/folder" />
+      <input type="url" id="ghFolderUrl" placeholder="GitHub folder URL — https://github.com/user/repo/tree/main/folder" />
       <button class="btn" onclick="addFromGitHubFolder()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
         From GitHub
       </button>
     </div>
-    <p style="font-size:.7rem;color:var(--muted);margin-top:7px;margin-bottom:10px;line-height:1.5;">
-      Paste a GitHub folder URL — images are added as raw URLs, no download needed.
-    </p>
 
-    <div class="divider-or">or</div>
+    <hr class="add-divider"/>
 
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-file" style="flex:1;justify-content:center;" onclick="document.getElementById('fileInput').click()">
+    <!-- File row -->
+    <div class="file-row">
+      <button class="btn btn-file btn-sm" onclick="document.getElementById('fileInput').click()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Load files
       </button>
-      <button class="btn btn-file" style="flex:1;justify-content:center;" onclick="document.getElementById('folderInput').click()">
+      <button class="btn btn-file btn-sm" onclick="document.getElementById('folderInput').click()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         Load folder
       </button>
+      <button class="btn-settings-toggle" id="settingsToggle" onclick="toggleUploadSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Upload settings ▶
+      </button>
     </div>
-    <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="addFromFiles(this.files)"/>
+
+    <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="addFromFiles(this.files, this)"/>
     <input type="file" id="folderInput" webkitdirectory style="display:none" onchange="addFromFolder(this.files)"/>
-    <p style="font-size:.7rem;color:var(--muted);margin-top:7px;line-height:1.5;">
-      Local files are compressed and embedded as base64 — fine for local preview. For client sharing, upload images to a server and use URLs.
-    </p>
-  </div>
 
-  <!-- CARD LIST -->
-  <div class="section-label">Images in playlist</div>
-  <div id="cardList">
-    <div class="empty-state" id="emptyState">No images yet — add some above.</div>
-  </div>
-
-  <!-- EXPORT -->
-  <div class="export-section">
-    <h2>Export Playlist</h2>
-    <p>Download as JSON, host on your server, load in the viewer via <code>?playlist=https://…/tour.json</code>.</p>
-    <div class="export-row">
-      <button class="btn btn-accent" onclick="downloadJSON()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download JSON
-      </button>
-      <button class="btn" onclick="toggleJsonPreview()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Preview JSON
-      </button>
-    </div>
-    <pre id="jsonPreview"></pre>
-  </div>
-
-</div><!-- /left-col -->
-
-<!-- ══ RIGHT COLUMN ═════════════════════════════════════ -->
-<div class="right-col">
-
-  <!-- LIVE PREVIEW -->
-  <div class="panel">
-    <div class="panel-body">
-      <div class="preview-img-wrap">
-        <img id="previewImg" />
-        <div class="preview-empty" id="previewEmpty">Select an image</div>
-      </div>
-      <div class="preview-footer">
-        <div class="preview-label" id="previewLabel"></div>
-        <div class="preview-size" id="previewSize"></div>
-      </div>
-      <div class="preview-counter" id="previewCounter"></div>
-    </div>
-  </div>
-
-  <!-- IMAGE OPTIMIZATION -->
-  <div class="panel">
-    <div class="panel-head" onclick="togglePanel('optBody','optChev')">
-      <span class="panel-title">Image Optimization</span>
-      <span class="panel-chevron" id="optChev">▶</span>
-    </div>
-    <div class="panel-body" id="optBody">
+    <!-- Inline upload settings -->
+    <div id="uploadSettingsBody">
       <div class="opt-grid">
         <div class="opt-field">
           <label>Max dimension</label>
@@ -506,26 +546,63 @@ h1 span{color:var(--accent);}
           <input type="range" id="optQuality" min="50" max="100" value="82" oninput="updateOptSettings()"/>
         </div>
       </div>
-
       <div class="opt-radio-row">
         <label><input type="radio" name="optFmt" value="webp" checked onchange="updateOptSettings()"> WebP</label>
         <label><input type="radio" name="optFmt" value="jpeg" onchange="updateOptSettings()"> JPEG</label>
         <label><input type="radio" name="optFmt" value="original" onchange="updateOptSettings()"> Original</label>
       </div>
-
       <label class="opt-check-row">
         <input type="checkbox" id="optAuto" checked onchange="updateOptSettings()"> Auto-compress on upload
       </label>
+      <div class="inline-stats">
+        Local files: <strong id="statCount">0</strong>
+        &nbsp;·&nbsp;
+        Embedded size: <strong id="statTotal" class="stats-val">—</strong>
+      </div>
+    </div>
 
-      <div class="stats-block">
-        <div class="stats-row">
-          <span class="stats-key">Local images</span>
-          <span class="stats-val" id="statCount">0</span>
+    <p class="add-note">Local files are embedded as base64 — fine for local preview. For client sharing, upload images to a server and use URLs.</p>
+  </div>
+
+  <!-- IMAGE LIST -->
+  <div class="list-header">
+    <span class="list-header-label">Images in playlist</span>
+    <span class="count-badge" id="countBadge">0</span>
+  </div>
+
+  <div id="cardList">
+    <div class="empty-state" id="emptyState">No images yet — add some above.</div>
+  </div>
+
+  <!-- JSON PREVIEW (below cards) -->
+  <pre id="jsonPreview"></pre>
+
+</div><!-- /left-col -->
+
+<!-- ══ RIGHT COLUMN ═════════════════════════════════════ -->
+<div class="right-col">
+
+  <!-- PREVIEW PANEL -->
+  <div class="panel">
+    <div class="panel-head" style="cursor:default;pointer-events:none;">
+      <span class="panel-title">Preview</span>
+    </div>
+    <div class="panel-body">
+      <div class="preview-img-wrap">
+        <img id="previewImg" alt=""/>
+        <div class="preview-empty" id="previewEmpty">Select an image</div>
+      </div>
+      <div class="preview-nav">
+        <button class="btn-icon" id="prevBtn" onclick="stepPreview(-1)" disabled title="Previous">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="preview-nav-center">
+          <div class="preview-label" id="previewLabel"></div>
+          <div class="preview-counter" id="previewCounter"></div>
         </div>
-        <div class="stats-row">
-          <span class="stats-key">Total embedded size</span>
-          <span class="stats-val" id="statTotal">—</span>
-        </div>
+        <button class="btn-icon" id="nextBtn" onclick="stepPreview(1)" disabled title="Next">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -537,9 +614,12 @@ h1 span{color:var(--accent);}
       <span class="panel-chevron" id="importChev">▶</span>
     </div>
     <div class="panel-body hidden" id="importBody">
-      <p style="font-size:.75rem;color:var(--muted);margin-bottom:10px;line-height:1.5;">
-        Paste a hosted playlist JSON URL to load it into the builder.
-      </p>
+      <button class="btn btn-file" style="width:100%;justify-content:center;margin-bottom:4px;" onclick="document.getElementById('importFileInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Open .json from device
+      </button>
+      <input type="file" id="importFileInput" accept=".json,application/json" style="display:none" onchange="importFromFile(this)"/>
+      <div class="divider-or">or from URL</div>
       <div class="import-input-row">
         <input type="url" id="importUrlInput" placeholder="https://yourserver.com/tour.json" />
         <button class="btn btn-sm" onclick="importFromUrl()">Load</button>
@@ -554,27 +634,23 @@ h1 span{color:var(--accent);}
       <span class="panel-chevron" id="shareChev">▶</span>
     </div>
     <div class="panel-body hidden" id="shareBody">
-      <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:14px;line-height:1.55;">
         Upload your JSON to a server, paste the URL below to build a ready-to-send viewer link.
       </p>
 
       <div class="opt-field" style="margin-bottom:10px;">
         <label>Hosted JSON URL</label>
-        <input type="url" id="shareJsonUrl" placeholder="https://yourserver.com/tour.json"
-          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:8px 11px;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"/>
+        <input type="url" id="shareJsonUrl" class="panel-input" placeholder="https://yourserver.com/tour.json" />
       </div>
 
       <div class="opt-field" style="margin-bottom:12px;">
         <label>Viewer URL</label>
-        <input type="url" id="shareViewerUrl" value="https://nuninhosousa25.github.io/360-view/" placeholder="https://yourserver.com/360viewer.html"
-          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:8px 11px;outline:none;transition:border-color .2s;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"/>
+        <input type="url" id="shareViewerUrl" class="panel-input" value="https://nuninhosousa25.github.io/360-view/" placeholder="https://yourserver.com/360viewer.html" />
       </div>
 
       <button class="btn btn-accent" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="generateShareLink()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        Generate & Copy Link
+        Generate &amp; Copy Link
       </button>
 
       <div id="shareOutputWrap" style="display:none;">
@@ -592,6 +668,24 @@ h1 span{color:var(--accent);}
 </div><!-- /right-col -->
 </div><!-- /layout -->
 </div><!-- /page -->
+
+<!-- ══ STICKY EXPORT BAR ════════════════════════════════ -->
+<div class="export-bar">
+  <div class="export-bar-info">
+    <span id="exportCount">0 images</span>
+    <span id="exportSizeInfo"></span>
+  </div>
+  <div class="export-bar-actions">
+    <button class="btn btn-sm" onclick="toggleJsonPreview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Preview JSON
+    </button>
+    <button class="btn btn-accent btn-sm" onclick="downloadJSON()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download JSON
+    </button>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -616,6 +710,16 @@ function togglePanel(bodyId, chevId) {
 }
 
 // ═══════════════════════════════════════
+//  UPLOAD SETTINGS TOGGLE
+// ═══════════════════════════════════════
+function toggleUploadSettings() {
+  const body = document.getElementById('uploadSettingsBody');
+  const btn  = document.getElementById('settingsToggle');
+  const isOpen = body.classList.toggle('open');
+  btn.classList.toggle('active', isOpen);
+}
+
+// ═══════════════════════════════════════
 //  OPTIMIZATION SETTINGS
 // ═══════════════════════════════════════
 function updateOptSettings() {
@@ -634,7 +738,6 @@ function updateOptSettings() {
 // ═══════════════════════════════════════
 function compressImage(file) {
   return new Promise(resolve => {
-    // Skip canvas if no resize and original format requested
     if (opt.format === 'original' && opt.maxDim === Infinity) {
       const fr = new FileReader();
       fr.onload = e => resolve(e.target.result);
@@ -694,11 +797,29 @@ function fmtBytes(b) {
 function updateStats() {
   const local = items.filter(i => i.isBase64);
   const total = local.reduce((s, i) => s + (i.sizeBytes || 0), 0);
+
+  // Inline settings stats
   document.getElementById('statCount').textContent = local.length;
-  const el = document.getElementById('statTotal');
-  if (!local.length) { el.textContent = '—'; el.className = 'stats-val'; return; }
-  el.textContent = fmtBytes(total);
-  el.className = 'stats-val ' + (total > 5e6 ? 'bad' : total > 1e6 ? 'warn' : 'good');
+  const stEl = document.getElementById('statTotal');
+  if (!local.length) {
+    stEl.textContent = '—';
+    stEl.className = 'stats-val';
+  } else {
+    stEl.textContent = fmtBytes(total);
+    stEl.className = 'stats-val ' + (total > 5e6 ? 'bad' : total > 1e6 ? 'warn' : 'good');
+  }
+
+  // Export bar stats
+  const n = items.length;
+  document.getElementById('exportCount').textContent = n + (n === 1 ? ' image' : ' images');
+  const sizeEl = document.getElementById('exportSizeInfo');
+  if (!local.length) {
+    sizeEl.textContent = '';
+    sizeEl.className = '';
+  } else {
+    sizeEl.textContent = '· ' + fmtBytes(total) + ' embedded';
+    sizeEl.className = total > 5e6 ? 'bad' : total > 1e6 ? 'warn' : 'good';
+  }
 }
 
 // ═══════════════════════════════════════
@@ -722,7 +843,7 @@ document.getElementById('urlInput').addEventListener('keydown', e => {
 // ═══════════════════════════════════════
 //  ADD FROM FILES
 // ═══════════════════════════════════════
-async function addFromFiles(files) {
+async function addFromFiles(files, sourceInput = null) {
   for (const file of [...files]) {
     const dataUrl = opt.auto
       ? await compressImage(file)
@@ -738,7 +859,7 @@ async function addFromFiles(files) {
     if (selectedIdx === -1) selectItem(items.length - 1);
     renderList();
   }
-  document.getElementById('fileInput').value = '';
+  if (sourceInput) sourceInput.value = '';
 }
 
 // ═══════════════════════════════════════
@@ -747,7 +868,6 @@ async function addFromFiles(files) {
 function parseGitHubUrl(url) {
   try {
     const parts = new URL(url).pathname.split('/').filter(Boolean);
-    // parts: [owner, repo, 'tree', branch, ...path]
     if (parts.length < 2) return null;
     const owner  = parts[0];
     const repo   = parts[1];
@@ -793,6 +913,7 @@ async function addFromGitHubFolder() {
 
     if (selectedIdx === -1 && items.length) selectItem(0);
     renderList();
+    document.getElementById('ghFolderUrl').value = '';
     showToast(`Added ${images.length} image(s) from GitHub ✓`);
   } catch(e) {
     showToast(`Failed: ${e.message}`);
@@ -844,9 +965,44 @@ async function importFromUrl() {
 }
 
 // ═══════════════════════════════════════
+//  IMPORT FROM LOCAL FILE
+// ═══════════════════════════════════════
+function importFromFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const loaded = (data.images || [])
+        .map(i => typeof i === 'string'
+          ? { url: i, label: guessLabel(i) }
+          : { url: i.url || '', label: i.label || guessLabel(i.url || '') })
+        .filter(i => i.url)
+        .map(i => {
+          const isBase64 = i.url.startsWith('data:');
+          return { id: uid(), ...i, isBase64, sizeBytes: isBase64 ? dataUrlBytes(i.url) : 0 };
+        });
+      if (!loaded.length) { showToast('No images found in JSON.'); return; }
+      if (data.title) document.getElementById('playlistTitle').value = data.title;
+      items = loaded;
+      selectedIdx = 0;
+      renderList();
+      selectItem(0);
+      showToast(`Loaded "${data.title || file.name}" — ${loaded.length} image(s) ✓`);
+    } catch(err) {
+      showToast(`Invalid JSON: ${err.message}`);
+    }
+  };
+  reader.onerror = () => showToast('Could not read file.');
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════
-function uid() { return Date.now() + Math.random(); }
+function uid() { return crypto.randomUUID(); }
 
 function pushItem(data) { items.push({ id: uid(), ...data }); }
 
@@ -869,9 +1025,10 @@ function removeItem(id) {
 }
 
 function moveItem(fromIdx, toIdx) {
+  const selectedId = items[selectedIdx] ? items[selectedIdx].id : null;
   const [item] = items.splice(fromIdx, 1);
   items.splice(toIdx, 0, item);
-  if (selectedIdx === fromIdx) selectedIdx = toIdx;
+  selectedIdx = selectedId ? items.findIndex(i => i.id === selectedId) : selectedIdx;
   renderList();
 }
 
@@ -887,29 +1044,50 @@ function selectItem(idx) {
   img.style.display = 'block';
   document.getElementById('previewEmpty').style.display = 'none';
   document.getElementById('previewLabel').textContent = item.label || `Image ${idx + 1}`;
-  document.getElementById('previewSize').textContent   = item.isBase64 ? fmtBytes(item.sizeBytes) : '';
-  document.getElementById('previewCounter').textContent = items.length > 1 ? `${idx + 1} / ${items.length}` : '';
+
+  // Counter: show size if local file
+  let counterText = items.length > 1 ? `${idx + 1} / ${items.length}` : '';
+  if (item.isBase64 && item.sizeBytes) {
+    counterText += (counterText ? '  ·  ' : '') + fmtBytes(item.sizeBytes);
+  }
+  document.getElementById('previewCounter').textContent = counterText;
+
+  updatePreviewNav();
 }
 
 function clearPreview() {
   document.getElementById('previewImg').style.display = 'none';
   document.getElementById('previewEmpty').style.display = 'flex';
   document.getElementById('previewLabel').textContent  = '';
-  document.getElementById('previewSize').textContent   = '';
   document.getElementById('previewCounter').textContent = '';
+  updatePreviewNav();
+}
+
+function updatePreviewNav() {
+  const disabled = items.length <= 1;
+  document.getElementById('prevBtn').disabled = disabled;
+  document.getElementById('nextBtn').disabled = disabled;
+}
+
+function stepPreview(dir) {
+  if (!items.length) return;
+  const next = (selectedIdx + dir + items.length) % items.length;
+  selectItem(next);
+  renderList();
 }
 
 // ═══════════════════════════════════════
 //  RENDER LIST
 // ═══════════════════════════════════════
 function renderList() {
-  const list  = document.getElementById('cardList');
+  const list = document.getElementById('cardList');
   document.getElementById('countBadge').textContent = items.length;
   updateStats();
 
   if (!items.length) {
     list.innerHTML = '';
     list.appendChild(document.getElementById('emptyState'));
+    if (document.getElementById('jsonPreview').classList.contains('show')) updateJsonPreview();
     return;
   }
 
@@ -1049,6 +1227,7 @@ function downloadJSON() {
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   a.download = slug + '.json';
   a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 100);
   showToast('JSON downloaded ✓');
 }
 
@@ -1101,6 +1280,11 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+updateStats();
 </script>
 </body>
 </html>
